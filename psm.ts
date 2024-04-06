@@ -44,14 +44,26 @@ fs.createReadStream(csvFileName)
         // Output the data as a table
         console.table(tableData);
 
-        // Indifference Price Point : 妥協価格
-        // Optimal Price Point : 理想価格
-        // Point of Marginal Cheapness (PMC) : 最低品質保証価格
         // Point of Marginal Expensiveness (PME) : 最高価格
+        // Indifference Price Point (IPP) : 妥協価格
+        // Optimal Price Point (OPP) : 理想価格
+        // Point of Marginal Cheapness (PMC) : 最低品質保証価格
 
-        const { beforePrice, afterPrice, beforeCol1, afterCol1, beforeCol2, afterCol2 } = findBeforeAfter(tableData, '高すぎて買えない', '安い');
-        console.log(`Cross point before: ${beforePrice}, 高すぎて買えない: ${beforeCol1}, 安い: ${beforeCol2}`);
-        console.log(`Cross point after: ${afterPrice}, 高すぎて買えない: ${afterCol1}, 安い: ${afterCol2}`);
+        console.log('');
+        
+        const pmeValue = findCrossPoints(tableData, '高すぎて買えない', '安い');
+        console.log(`最高価格　　　　 : ${pmeValue.targetPoint}`);
+
+        const ippValue = findCrossPoints(tableData, '高い', '安い');
+        console.log(`妥協価格　　　　 : ${ippValue.targetPoint}`);
+
+        const oppValue = findCrossPoints(tableData, '高すぎて買えない', '安すぎて買わない');
+        console.log(`理想価格　　　　 : ${oppValue.targetPoint}`);
+
+        const pmcValue = findCrossPoints(tableData, '高い', '安すぎて買わない');
+        console.log(`最低品質保証価格 : ${pmcValue.targetPoint}`);
+
+        console.log('');
     });
 
 function calculateExpensivePercentages(responses: Array<{expensive:number}>) {
@@ -126,11 +138,15 @@ type PricePointPercentages = {
     安すぎて買わない: string;
 };
 
-function findBeforeAfter(tableData: PricePointPercentages[], col1: keyof PricePointPercentages, col2: keyof PricePointPercentages): 
+function findCrossPoints(tableData: PricePointPercentages[], col1: keyof PricePointPercentages, col2: keyof PricePointPercentages): 
 { 
-    beforePrice: string; afterPrice: string;
-    beforeCol1: string; afterCol1: string;
-    beforeCol2: string; afterCol2: string; 
+    x1: number;
+    x2: number;
+    y1: number;
+    y2: number;
+    y3: number;
+    y4: number;
+    targetPoint: string;
 }{
     let crossPointBefore = { price: 'Not Found', col1: '0%', col2: '0%' };
     let crossPointAfter = { price: 'Not Found', col1: '0%', col2: '0%' };
@@ -142,24 +158,38 @@ function findBeforeAfter(tableData: PricePointPercentages[], col1: keyof PricePo
 
         if (percentage1 > percentage2 && !foundCrossPoint) {
             crossPointAfter = {
-            price: tableData[i].Price,
-            col1: tableData[i][col1],
-            col2: tableData[i][col2]
+                price: tableData[i].Price.replace(' 円', ''),
+                col1: tableData[i][col1].replace('%', ''),
+                col2: tableData[i][col2].replace('%', '')
             };
             if (i > 0) {
-            crossPointBefore = {
-                price: tableData[i - 1].Price,
-                col1: tableData[i - 1][col1],
-                col2: tableData[i - 1][col2]
-            };
+                crossPointBefore = {
+                    price: tableData[i - 1].Price.replace(' 円', ''),
+                    col1: tableData[i - 1][col1].replace('%', ''),
+                    col2: tableData[i - 1][col2].replace('%', '')
+                };
             }
             foundCrossPoint = true;
             break;
         }
     }
-    return {
-        beforePrice: crossPointBefore.price, afterPrice: crossPointAfter.price,
-        beforeCol1: crossPointBefore.col1, afterCol1: crossPointAfter.col1,
-        beforeCol2: crossPointBefore.col2, afterCol2: crossPointAfter.col2
-    };
+
+    // Cross Point Before Price : X1, X3
+    // Cross Point After Price : X2, X4
+    // Cross Point Before Col 1 : Y1
+    // Cross Point Before Col 2 : Y2
+    // Cross Point After Col 1 : Y3
+    // Cross Point After Col 2 : Y4
+
+    let x1 = parseFloat(crossPointBefore.price);
+    let x2 = parseFloat(crossPointAfter.price);
+    let y1 = parseFloat(crossPointBefore.col1);
+    let y2 = parseFloat(crossPointAfter.col1);
+    let y3 = parseFloat(crossPointBefore.col2);
+    let y4 = parseFloat(crossPointAfter.col2);
+
+    let targetPointCalculation = ((y3-y1)*((x1-x2)**2)+x1*(y1-y2)*(x1-x2)-x1*(y3-y4)*(x1-x2))/((y1-y2)*(x1-x2)-(x1-x2)*(y3-y4));
+    let targetPoint = targetPointCalculation.toFixed(1);
+
+    return { x1, x2, y1, y2, y3, y4, targetPoint };
 }
