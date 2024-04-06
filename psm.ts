@@ -28,8 +28,8 @@ fs.createReadStream(csvFileName)
     .on('end', () => {
         calculateExpensivePercentages(responses);
         calculateCheapPercentages(responses);
-        //calculateTooExpensivePercentages(responses);
-        //calculateTooCheapPercentages(responses);
+        calculateTooExpensivePercentages(responses);
+        calculateTooCheapPercentages(responses);
     });
 
 function calculateExpensivePercentages(responses: Array<{expensive:number}>) {
@@ -67,5 +67,43 @@ function calculateCheapPercentages(responses: Array<{cheap:number}>) {
     console.log("安い：")
     pricePoints.forEach((price, index) => {
         console.log(`${price} 円：${cheapPercentages[index].toFixed(1)}%`);
+    });
+}
+
+function calculateTooExpensivePercentages(responses: Array<{tooExpensive:number}>) {
+    const pricePoints = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600];
+    let counts = new Array(pricePoints.length).fill(0);
+
+    responses.forEach(response => {
+        pricePoints.forEach((price, index) => {
+            if(response.tooExpensive <= price){
+                counts[index]++;
+            }
+        });
+    });
+
+    let tooExpensivePercentages = counts.map(count => (count / responses.length) * 100);
+    console.log("高い：")
+    pricePoints.forEach((price, index) => {
+        console.log(`${price} 円：${tooExpensivePercentages[index].toFixed(1)}%`);
+    });
+}
+
+function calculateTooCheapPercentages(responses: Array<{tooCheap:number}>) {
+    const pricePoints = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600];
+    let counts = new Array(pricePoints.length).fill(0);
+
+    responses.forEach(response => {
+        pricePoints.forEach((price, index) => {
+            if(response.tooCheap >= price){
+                counts[index]++;
+            }
+        });
+    });
+
+    let tooCheapPercentages = counts.map(count => (count / responses.length) * 100);
+    console.log("安い：")
+    pricePoints.forEach((price, index) => {
+        console.log(`${price} 円：${tooCheapPercentages[index].toFixed(1)}%`);
     });
 }
