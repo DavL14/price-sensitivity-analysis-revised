@@ -26,16 +26,46 @@ fs.createReadStream(csvFileName)
         });
     })
     .on('end', () => {
-        calculateAndPrintPSM(responses);
+        calculateExpensivePercentages(responses);
+        calculateCheapPercentages(responses);
+        //calculateTooExpensivePercentages(responses);
+        //calculateTooCheapPercentages(responses);
     });
 
-function calculateAndPrintPSM(responses: Array<{expensive:number, cheap:number, tooExpensive:number, tooCheap:number}>) {
-    // Loop through each response and print the values. 
-    // I did this to help verify that my data is being read correctly before proceeding with any calculations.
-    responses.forEach((response, index) => {
-        console.log(`Sample ${index + 1}: Expensive - ${response.expensive}, Cheap - ${response.cheap}, Too Expensive - ${response.tooExpensive}, Too Cheap - ${response.tooCheap}`);
+function calculateExpensivePercentages(responses: Array<{expensive:number}>) {
+    const pricePoints = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600];
+    let counts = new Array(pricePoints.length).fill(0);
+
+    responses.forEach(response => {
+        pricePoints.forEach((price, index) => {
+            if(response.expensive <= price){
+                counts[index]++;
+            }
+        });
     });
 
-    // Added calculation logic after verifying that the data is being read correctly.
+    let expensivePercentages = counts.map(count => (count / responses.length) * 100);
+    console.log("高い：")
+    pricePoints.forEach((price, index) => {
+        console.log(`${price} 円：${expensivePercentages[index].toFixed(1)}%`);
+    });
+}
 
+function calculateCheapPercentages(responses: Array<{cheap:number}>) {
+    const pricePoints = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600];
+    let counts = new Array(pricePoints.length).fill(0);
+
+    responses.forEach(response => {
+        pricePoints.forEach((price, index) => {
+            if(response.cheap >= price){
+                counts[index]++;
+            }
+        });
+    });
+
+    let cheapPercentages = counts.map(count => (count / responses.length) * 100);
+    console.log("安い：")
+    pricePoints.forEach((price, index) => {
+        console.log(`${price} 円：${cheapPercentages[index].toFixed(1)}%`);
+    });
 }
