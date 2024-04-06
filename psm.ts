@@ -177,8 +177,8 @@ function findCrossPoints(tableData: PricePointPercentages[], col1: keyof PricePo
     // Cross Point Before Price : X1, X3
     // Cross Point After Price : X2, X4
     // Cross Point Before Col 1 : Y1
-    // Cross Point Before Col 2 : Y2
-    // Cross Point After Col 1 : Y3
+    // Cross Point After Col 1 : Y2
+    // Cross Point Before Col 2 : Y3
     // Cross Point After Col 2 : Y4
 
     let x1 = parseFloat(crossPointBefore.price);
@@ -188,8 +188,8 @@ function findCrossPoints(tableData: PricePointPercentages[], col1: keyof PricePo
     let y3 = parseFloat(crossPointBefore.col2);
     let y4 = parseFloat(crossPointAfter.col2);
 
-    let targetPointCalculation = ((y3-y1)*((x1-x2)**2)+x1*(y1-y2)*(x1-x2)-x1*(y3-y4)*(x1-x2))/((y1-y2)*(x1-x2)-(x1-x2)*(y3-y4));
-    let targetPoint = targetPointCalculation.toFixed(1);
+    let targetPointCalculation = (( y3 - y1 ) * (( x1 - x2 ) ** 2 )+ x1 * ( y1 - y2 ) * ( x1 - x2 ) - x1 * ( y3 - y4 ) * ( x1 - x2 )) / (( y1 - y2 ) * ( x1 - x2 ) - ( x1 - x2 ) * ( y3 - y4 ));
+    let targetPoint = targetPointCalculation.toFixed(2);
 
     return { x1, x2, y1, y2, y3, y4, targetPoint };
 }
