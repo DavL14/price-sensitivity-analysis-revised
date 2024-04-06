@@ -83,7 +83,7 @@ function calculateTooExpensivePercentages(responses: Array<{tooExpensive:number}
     });
 
     let tooExpensivePercentages = counts.map(count => (count / responses.length) * 100);
-    console.log("高い：")
+    console.log("高すぎて買えない：")
     pricePoints.forEach((price, index) => {
         console.log(`${price} 円：${tooExpensivePercentages[index].toFixed(1)}%`);
     });
@@ -102,7 +102,7 @@ function calculateTooCheapPercentages(responses: Array<{tooCheap:number}>) {
     });
 
     let tooCheapPercentages = counts.map(count => (count / responses.length) * 100);
-    console.log("安い：")
+    console.log("安すぎて買わない：")
     pricePoints.forEach((price, index) => {
         console.log(`${price} 円：${tooCheapPercentages[index].toFixed(1)}%`);
     });
