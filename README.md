@@ -20,4 +20,7 @@ Price Sensitivity Measurement (PSM) Analysis is a statistical method used to det
    npm install --save-dev typescript @types/node
 
 4. Go into the directory of the cloned project.
-5. Execute the program by running: "ts-node psm.ts --csvfile PSMrawdata" in the terminal.
+5. Execute the program by running this command in the terminal.
+
+   ```sh
+   ts-node psm.ts --csvfile PSMrawdata
